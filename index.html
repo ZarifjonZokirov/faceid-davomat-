@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Davomat | HRMS</title>
+    <style>
+      :root {
+        --primary: #5d70e7;
+        --primary-dark: #5366dc;
+        --primary-soft: #e8edff;
+        --ink: #1f2937;
+        --muted: #737985;
+        --line: #edf0f4;
+        --green: #39b985;
+        --red: #d4565b;
+        --bg: #f8fafc;
+        --white: #ffffff;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        background: #eaf0fb;
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      button { font: inherit; cursor: pointer; }
+      .app {
+        width: 100%;
+        max-width: 600px;
+        min-height: 100vh;
+        margin: 0 auto;
+        background: var(--bg);
+        box-shadow: 0 0 40px rgba(60, 80, 120, 0.08);
+      }
+
+      .hero {
+        min-height: 230px;
+        padding: 26px 24px 22px;
+        background: linear-gradient(145deg, #e8efff 0%, #dbe7fb 100%);
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .topline h1 {
+        margin: 0;
+        font-size: 25px;
+        letter-spacing: -0.5px;
+      }
+      .top-actions-wrap {
+        display: flex;
+        gap: 10px;
+      }
+      .info-trigger { position: relative; }
+      .info-card {
+        position: absolute;
+        top: 64px;
+        right: 0;
+        display: none;
+        width: 250px;
+        padding: 14px;
+        border: 1px solid #dce3f5;
+        border-radius: 12px;
+        color: #3f4a5c;
+        background: #fff;
+        box-shadow: 0 10px 24px rgba(45, 65, 105, 0.16);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+      .info-card.visible,
+      .info-trigger:hover .info-card,
+      .info-trigger:focus-within .info-card {
+        display: block;
+      }
+      .info-card strong {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--primary);
+        font-size: 15px;
+      }
+
+      .icon-button {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 0;
+        border-radius: 14px;
+        color: var(--primary);
+        background: rgba(255, 255, 255, 0.5);
+        font-size: 25px;
+      }
+      #remoteWorkButton:hover, #remoteWorkButton:focus-visible,
+      #leaveButton:hover, #leaveButton:focus-visible {
+        color: white;
+        box-shadow: 0 0 0 3px rgba(44, 170, 114, 0.24);
+      }
+      #remoteWorkButton:hover, #remoteWorkButton:focus-visible { background: #e28a27; }
+      #leaveButton:hover, #leaveButton:focus-visible { background: #2caa72; }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-top: 14px;
+      }
+      .avatar {
+        display: grid;
+        place-items: center;
+        width: 108px;
+        height: 108px;
+        flex: 0 0 auto;
+        overflow: hidden;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        color: white;
+        background: linear-gradient(145deg, #8b9b87, #253b4a);
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .avatar img { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        object-position: center 25%; 
+      }
+      .icon-button[hidden] { display: none; }
+      .icon-button.status-active { color: #188457; background: #e7f6ee; }
+      .profile h2 {
+        margin: 0 0 13px;
+        font-size: 28px;
+        line-height: 1.12;
+        font-weight: 500;
+      }
+      .profile p {
+        margin: 0;
+        color: #566070;
+        font-size: 23px;
+      }
+
+      main {
+        padding: 0 24px 110px;
+        background: var(--white);
+        border-radius: 25px 25px 0 0;
+      }
+      .today-card {
+        position: relative;
+        top: 46px;
+        margin-bottom: 81px;
+        padding: 17px;
+        border-radius: 17px;
+        background: var(--white);
+      }
+      .today-penalty-box {
+        margin-top: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .today-penalty-box.has-penalty {
+        background: #fff1f2;
+        border-color: #fecdd3;
+      }
+      .today-penalty-box.on-time {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+      .penalty-label-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+      }
+      .penalty-icon {
+        font-size: 18px;
+        line-height: 1;
+      }
+      .penalty-val-group {
+        text-align: right;
+      }
+      .penalty-val {
+        font-size: 16px;
+        font-weight: 800;
+        color: #e11d48;
+      }
+      .penalty-val.clean {
+        color: #16a34a;
+      }
+      .penalty-sub {
+        font-size: 12px;
+        color: #64748b;
+      }
+      .date-title {
+        margin: 0 0 18px;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .time-panel {
+        display: flex;
+        padding: 23px 13px;
+        border-radius: 13px;
+        background: #7d92ef;
+      }
+      .time {
+        flex: 1;
+        text-align: center;
+      }
+      .time + .time { border-left: 2px solid rgba(255,255,255,0.4); }
+      .time strong {
+        display: block;
+        margin-bottom: 15px;
+        font-size: 28px;
+        letter-spacing: 1px;
+      }
+      .time span {
+        font-size: 21px;
+      }
+      .elapsed-time {
+        margin: 12px 0 0;
+        color: rgba(255,255,255,0.92);
+        font-size: 16px;
+        text-align: center;
+      }
+      .attendance-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 17px;
+      }
+      .attendance-actions button {
+        min-height: 67px;
+        border: 0;
+        border-radius: 9px;
+        color: #6172c5;
+        background: white;
+        font-size: 23px;
+      }
+      .attendance-actions button:active { transform: scale(0.98); }
+
+      .month-picker {
+        display: grid;
+        grid-template-columns: 58px 1fr 58px;
+        gap: 12px;
+        margin-bottom: 25px;
+      }
+      .month-picker button, .month-name {
+        min-height: 64px;
+        border: 1px solid #dfe2e7;
+        border-radius: 10px;
+        background: white;
+      }
+      .month-picker button {
+        color: #4d5660;
+        font-size: 39px;
+        line-height: 1;
+      }
+      .month-name {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        font-size: 23px;
+      }
+      .calendar-icon {
+        color: #656c75;
+        font-size: 27px;
+      }
+
+      .history {
+        display: grid;
+        gap: 14px;
+      }
+      .day-card {
+        padding: 21px 18px 18px;
+        border: 1px solid #f0f1f3;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(40, 50, 70, 0.03);
+      }
+      .day-card h3 {
+        margin: 0 0 20px;
+        font-size: 23px;
+        font-weight: 500;
+      }
+      .day-details {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 17px;
+        border-top: 1px solid #f1f2f4;
+      }
+      .times {
+        color: #8c929d;
+        font-size: 18px;
+      }
+      .arrive { color: var(--green); font-size: 24px; font-weight: 700; }
+      .leave { margin-left: 14px; color: var(--red); font-size: 24px; font-weight: 700; }
+      .missed {
+        padding: 8px 14px;
+        border-radius: 20px;
+        color: #c77b7d;
+        background: #fff1f1;
+        font-size: 18px;
+      }
+
+      .profile-view {
+        display: none;
+        min-height: calc(100vh - 268px);
+        padding: 28px 24px 110px;
+        background: var(--white);
+        border-radius: 25px 25px 0 0;
+      }
+      .profile-view.visible { display: block; }
+      .dashboard-view.hidden { display: none; }
+      .profile-heading {
+        margin: 0 0 24px;
+        font-size: 26px;
+      }
+      .profile-editor {
+        display: grid;
+        gap: 20px;
+      }
+      .photo-editor {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      .profile-photo {
+        display: grid;
+        place-items: center;
+        width: 84px;
+        height: 84px;
+        overflow: hidden;
+        flex: 0 0 auto;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        color: white;
+        background: linear-gradient(145deg, #8b9b87, #253b4a);
+        font-size: 24px;
+        font-weight: 700;
+        box-shadow: 0 1px 4px rgba(20, 30, 50, 0.15);
+      }
+      .profile-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 25%;
+      }
+      .photo-copy {
+        display: grid;
+        gap: 8px;
+      }
+      .photo-copy strong { font-size: 19px; }
+      .photo-copy span { color: var(--muted); font-size: 14px; }
+      .file-label {
+        display: inline-block;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: var(--primary);
+        background: var(--primary-soft);
+        font-size: 15px;
+        cursor: pointer;
+      }
+      .file-label input { display: none; }
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+      .field label {
+        color: #586170;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .field input {
+        width: 100%;
+        min-height: 52px;
+        padding: 0 14px;
+        border: 1px solid #dfe3ea;
+        border-radius: 9px;
+        color: var(--ink);
+        background: #fff;
+        font-size: 18px;
+      }
+      .field input[readonly] {
+        color: #687180;
+        background: #f5f7fa;
+        cursor: not-allowed;
+      }
+      .field small {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .save-profile, .logout-button {
+        min-height: 53px;
+        border: 0;
+        border-radius: 9px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .save-profile {
+        color: white;
+        background: var(--primary);
+      }
+      .logout-button {
+        border: 1px solid #f0caca;
+        color: var(--red);
+        background: #fff7f7;
+      }
+
+      /* Profil: Jarimalar bo'limi */
+      .penalties-card {
+        margin-top: 24px;
+        padding: 20px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      }
+      .penalties-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .penalties-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .penalties-title-wrap h3 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .penalties-badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .penalties-summary-box {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+        padding: 14px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+        text-align: center;
+      }
+      .penalty-stat-item .stat-title {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .penalty-stat-item .stat-num {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 4px;
+      }
+      .penalty-stat-item .stat-num.danger {
+        color: #e11d48;
+      }
+      .penalties-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .penalty-select {
+        flex: 1;
+        min-width: 110px;
+        height: 40px;
+        padding: 0 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        background: #fff;
+        outline: none;
+      }
+      .penalty-refresh-btn {
+        height: 40px;
+        padding: 0 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .penalty-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 380px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+      .penalty-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        gap: 10px;
+      }
+      .penalty-item.has-delay {
+        border-left: 4px solid #ef4444;
+      }
+      .penalty-item.on-time {
+        border-left: 4px solid #10b981;
+      }
+      .penalty-item-date {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+      .penalty-item-meta {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+      .penalty-item-amt {
+        text-align: right;
+      }
+      .penalty-item-price {
+        font-size: 14px;
+        font-weight: 800;
+        color: #ef4444;
+      }
+      .penalty-item-price.zero {
+        color: #10b981;
+      }
+      .penalty-item-status {
+        font-size: 11px;
+        color: #64748b;
+      }
+      .penalties-empty {
+        padding: 24px 12px;
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+      }
+
+      .login-screen {
+        display: none;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+        background: linear-gradient(145deg, #e8efff 0%, #dbe7fb 100%);
+      }
+      .login-screen.visible { display: grid; }
+      .login-card {
+        width: min(100%, 420px);
+        padding: 28px 24px;
+        border-radius: 20px;
+        background: white;
+        box-shadow: 0 12px 35px rgba(60, 80, 120, 0.12);
+      }
+      .login-card h1 {
+        margin: 0 0 8px;
+        color: var(--primary);
+        font-size: 30px;
+      }
+      .login-card p {
+        margin: 0 0 25px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+      .login-card .field { margin-bottom: 16px; }
+      .password-field { position: relative; }
+      .password-field input { padding-right: 52px; }
+      .password-toggle {
+        position: absolute;
+        right: 10px;
+        bottom: 7px;
+        width: 40px;
+        height: 38px;
+        border: 0;
+        border-radius: 8px;
+        color: #687180;
+        background: transparent;
+        font-size: 21px;
+      }
+      .login-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 53px;
+        border: 0;
+        border-radius: 9px;
+        color: white;
+        background: var(--primary);
+        font-size: 18px;
+        font-weight: 700;
+        transition: background 0.25s ease, opacity 0.25s ease;
+      }
+      .login-button:disabled {
+        background: #a5b4fc !important;
+        opacity: 0.75;
+        cursor: not-allowed;
+      }
+      .login-card input:disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+        border-color: #cbd5e1;
+      }
+      .btn-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.35);
+        border-radius: 50%;
+        border-top-color: #ffffff;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .login-error {
+        min-height: 20px;
+        margin: 0 0 12px;
+        color: var(--red);
+        font-size: 14px;
+      }
+      .error-toast {
+        position: fixed;
+        z-index: 20;
+        top: 18px;
+        left: 50%;
+        width: min(calc(100% - 32px), 360px);
+        padding: 14px 18px;
+        border: 1px solid #f2b8b5;
+        border-radius: 12px;
+        color: #8a1c1c;
+        background: #fff4f2;
+        box-shadow: 0 10px 24px rgba(120, 35, 35, 0.16);
+        font-size: 15px;
+        font-weight: 700;
+        text-align: center;
+        transform: translate(-50%, -150%);
+        opacity: 0;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+      }
+      .error-toast.visible {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+
+      .reason-modal {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(25, 35, 55, 0.28);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+      .reason-modal.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .reason-card {
+        width: min(100%, 380px);
+        padding: 20px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 16px 40px rgba(30, 45, 75, 0.2);
+        transform: translateY(-12px);
+        transition: transform 0.25s ease;
+      }
+      .reason-modal.visible .reason-card { transform: translateY(0); }
+      .reason-card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+      }
+      .reason-card p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .reason-card textarea {
+        width: 100%;
+        min-height: 86px;
+        padding: 11px;
+        resize: vertical;
+        border: 1px solid #dfe3ea;
+        border-radius: 9px;
+        font: inherit;
+        outline-color: var(--primary);
+      }
+      .reason-error {
+        min-height: 18px;
+        margin: 6px 0 0 !important;
+        color: var(--red) !important;
+        font-size: 13px !important;
+      }
+      .reason-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 12px;
+      }
+      .reason-actions button {
+        min-height: 44px;
+        border: 0;
+        border-radius: 8px;
+        font-weight: 700;
+      }
+      .scanner-modal {
+        position: fixed;
+        z-index: 10;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        background: #101820;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.25s ease;
+      }
+      .scanner-modal.visible { opacity: 1; visibility: visible; }
+      
+      /* Oq rang (Ekran chirog'i / Fon yoritgichi - qorong'u joylarda yuzni yoritish uchun) */
+      .scanner-modal.theme-light {
+        background: #ffffff !important;
+      }
+      .scanner-modal.theme-light .scanner-card {
+        background: #ffffff !important;
+      }
+      .scanner-modal.theme-light .scanner-status {
+        color: #0f172a !important;
+        font-weight: bold;
+      }
+      .scanner-modal.theme-light .scanner-video {
+        border-color: #00A651 !important;
+        box-shadow: 0 0 45px rgba(255, 255, 255, 0.9), 0 0 0 6px rgba(0, 166, 81, 0.2);
+      }
+      .scanner-modal.theme-light .scanner-theme-btn {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+      }
+      .scanner-modal.theme-light .scanner-close-btn {
+        background: #f1f5f9;
+        color: #334155;
+      }
+
+      .scanner-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+        background: #101820;
+        transition: background-color 0.25s ease;
+      }
+      .scanner-top-bar {
+        position: absolute;
+        top: max(16px, env(safe-area-inset-top));
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 12;
+      }
+      .scanner-theme-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .scanner-theme-btn:hover {
+        transform: scale(1.03);
+      }
+      .scanner-close-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 0;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-size: 18px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        transition: all 0.2s ease;
+      }
+      .scanner-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .scanner-video {
+        display: block;
+        width: min(82vw, 360px);
+        max-height: 70dvh;
+        aspect-ratio: 0.78;
+        border: 2px solid rgba(255, 255, 255, 0.82);
+        border-radius: 50% / 47%;
+        background: #17202a;
+        object-fit: cover;
+        transform: scaleX(-1);
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      }
+      .scanner-status {
+        width: min(100%, 320px);
+        min-height: 40px;
+        margin: 0;
+        color: #edf4f6;
+        font-size: 15px;
+        line-height: 1.4;
+        text-align: center;
+        transition: color 0.25s ease;
+      }
+
+      @media (max-width: 450px) {
+        .scanner-card { gap: 14px; }
+        .scanner-video {
+          width: min(78vw, 320px);
+          max-height: 68dvh;
+        }
+      }
+      .reason-cancel {
+        color: #596273;
+        background: #eef1f5;
+      }
+      .reason-save {
+        color: white;
+        background: var(--primary);
+      }
+
+      /* Maxsus Geomanzil va GPS Ogohlantirish Modali */
+      .geo-alert-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+      .geo-alert-modal.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .geo-alert-card {
+        width: min(100%, 390px);
+        padding: 24px;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+        text-align: center;
+        transform: scale(0.95);
+        transition: transform 0.25s ease;
+      }
+      .geo-alert-modal.visible .geo-alert-card {
+        transform: scale(1);
+      }
+      .geo-alert-icon {
+        width: 62px;
+        height: 62px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .geo-alert-icon.warning {
+        background: #fff1f2;
+        color: #e11d48;
+        border: 2px solid #fecdd3;
+      }
+      .geo-alert-icon.gps {
+        background: #fef3c7;
+        color: #d97706;
+        border: 2px solid #fde68a;
+      }
+      .geo-alert-title {
+        margin: 0 0 8px;
+        font-size: 19px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      .geo-alert-desc {
+        margin: 0 0 20px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #475569;
+      }
+      .geo-alert-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 18px;
+      }
+      .geo-alert-btn {
+        width: 100%;
+        padding: 13px 20px;
+        border: 0;
+        border-radius: 14px;
+        background: #00A651;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .geo-alert-btn:hover {
+        background: #008f45;
+        transform: scale(1.02);
+      }
+
+      .bottom-nav {
+        position: fixed;
+        z-index: 5;
+        bottom: 0;
+        left: 50%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        width: 100%;
+        max-width: 600px;
+        min-height: 83px;
+        transform: translateX(-50%);
+        border-top: 1px solid #f0f1f3;
+        background: rgba(255,255,255,0.97);
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 0;
+        color: #72777d;
+        background: transparent;
+        font-size: 17px;
+      }
+      .nav-icon {
+        font-size: 31px;
+        line-height: 1;
+      }
+      .nav-item.active { color: var(--primary); }
+
+      @media (max-width: 450px) {
+        .hero { min-height: 180px; padding: 16px 14px 16px; }
+        .topline h1 { font-size: 21px; }
+        .icon-button {
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          font-size: 19px;
+        }
+        .top-actions-wrap { gap: 6px; }
+        .profile { gap: 12px; margin-top: 10px; }
+        .avatar { width: 72px; height: 72px; font-size: 21px; }
+        .profile h2 { margin-bottom: 5px; font-size: 20px; }
+        .profile p { font-size: 16px; }
+        main { padding: 0 14px 92px; border-radius: 18px 18px 0 0; }
+        .today-card {
+          top: 22px;
+          margin-bottom: 43px;
+          padding: 12px;
+          border-radius: 13px;
+        }
+        .date-title { margin-bottom: 12px; font-size: 18px; }
+        .time-panel { padding: 14px 8px; border-radius: 10px; }
+        .time strong { margin-bottom: 7px; font-size: 22px; }
+        .time span { font-size: 14px; }
+        .elapsed-time { margin-top: 8px; font-size: 13px; }
+        .attendance-actions { gap: 8px; margin-top: 10px; }
+        .attendance-actions button { min-height: 48px; font-size: 16px; }
+        .month-picker {
+          grid-template-columns: 42px 1fr 42px;
+          gap: 7px;
+          margin-bottom: 16px;
+        }
+        .month-picker button, .month-name { min-height: 46px; border-radius: 8px; }
+        .month-picker button { font-size: 28px; }
+        .month-name { gap: 6px; font-size: 16px; }
+        .calendar-icon { font-size: 20px; }
+        .history { gap: 9px; }
+        .day-card { padding: 13px 12px 12px; border-radius: 8px; }
+        .day-card h3 { margin-bottom: 12px; font-size: 17px; }
+        .day-details { padding-top: 10px; }
+        .times { font-size: 14px; }
+        .arrive, .leave { font-size: 18px; }
+        .leave { margin-left: 7px; }
+        .missed { padding: 5px 9px; font-size: 13px; }
+        .profile-view { min-height: calc(100vh - 180px); padding: 20px 14px 92px; border-radius: 18px 18px 0 0; }
+        .profile-heading { margin-bottom: 16px; font-size: 22px; }
+        .photo-editor { gap: 12px; padding: 12px; border-radius: 10px; }
+        .profile-photo { width: 64px; height: 64px; font-size: 18px; }
+        .photo-copy strong { font-size: 16px; }
+        .photo-copy span { font-size: 12px; }
+        .field input { min-height: 46px; font-size: 16px; }
+        .save-profile, .logout-button { min-height: 46px; font-size: 16px; }
+        .bottom-nav { min-height: 66px; }
+        .nav-item { gap: 3px; font-size: 13px; }
+        .nav-icon { font-size: 24px; }
+      }
+
+      @media (max-width: 360px) {
+        .profile h2 { max-width: 190px; font-size: 18px; }
+        .profile p { font-size: 14px; }
+        .date-title { font-size: 16px; }
+        .time span { font-size: 12px; }
+        .month-name { font-size: 14px; }
+        .day-card h3 { font-size: 15px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div class="topline">
+          <h1>Asosiy</h1>
+          <div class="top-actions-wrap">
+            <div class="info-trigger">
+              <button class="icon-button" id="remoteWorkButton" aria-label="Ta'til" hidden>✈️</button>
+              <div class="info-card" id="remoteWorkInfo">
+                <strong>Ta'til holati</strong>
+                HRMS bu holatni vakolatli xodim tomonidan boshqaradi.
+              </div>
+            </div>
+            <div class="info-trigger">
+              <button class="icon-button" id="leaveButton" aria-label="Xizmat safari" hidden>🍃</button>
+              <div class="info-card" id="leaveInfo">
+                <strong>Xizmat safari</strong>
+                HRMS bu holatni vakolatli xodim tomonidan boshqaradi.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile">
+          <div class="avatar" aria-label="Profil rasmi"><span>ZS</span></div>
+          <div>
+            <h2></h2>
+            <p></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard-view" id="dashboardView">
+        <section class="today-card">
+          <h2 class="date-title" id="todayDate">Chorshanba, 16.09.2026</h2>
+          <div class="time-panel">
+            <div class="time">
+              <strong id="startTime">--:--</strong>
+              <span>Boshlanish vaqti</span>
+            </div>
+            <div class="time">
+              <strong id="endTime">--:--</strong>
+              <span>To'gash vaqti</span>
+            </div>
+          </div>
+          <p class="elapsed-time" id="elapsedTime">Ish boshlanmagan</p>
+          <div class="today-penalty-box on-time" id="todayPenaltyBox">
+            <div class="penalty-label-group">
+              <span class="penalty-icon" id="todayPenaltyIcon">⏱️</span>
+              <span id="todayPenaltyTitle">Bugungi jarima holati</span>
+            </div>
+            <div class="penalty-val-group">
+              <div class="penalty-val clean" id="todayPenaltyVal">0 so'm</div>
+              <div class="penalty-sub" id="todayPenaltySub">Kechikish yo'q</div>
+            </div>
+          </div>
+          <div class="attendance-actions">
+            <button id="startButton">Keldim |←</button>
+            <button id="endButton">Ketdim |→</button>
+          </div>
+        </section>
+
+        <section class="month-picker" aria-label="Oy tanlov">
+          <button id="previousMonth" aria-label="Oldingi oy">‹</button>
+          <div class="month-name">
+            <span class="calendar-icon">▣</span>
+            <span id="monthLabel">2026-yil, sentyabr</span>
+          </div>
+          <button id="nextMonth" aria-label="Keyingi oy">›</button>
+        </section>
+
+        <section class="history" id="history"></section>
+      </main>
+
+      <section class="profile-view" id="profileView">
+        <h2 class="profile-heading">Profil</h2>
+        <div class="profile-editor">
+          <div class="photo-editor">
+            <div class="profile-photo" id="profilePhoto"></div>
+            <div class="photo-copy">
+              <strong>HRMS etalon rasmi</strong>
+              <span>Rasm HRMS xodimlar bazasidan olinadi</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="nameInput">Ism va familiya</label>
+            <input id="nameInput" type="text" autocomplete="name" readonly />
+            <small>Ism HRMS xodimlar bazasidan olinadi.</small>
+          </div>
+
+          <div class="field">
+            <label for="branchInput">Filial</label>
+            <input id="branchInput" type="text" readonly />
+          </div>
+
+          <div class="field">
+            <label for="roleInput">Lavozim</label>
+            <input id="roleInput" type="text" readonly />
+          </div>
+
+          <!-- Jarimalar Bo'limi -->
+          <div class="penalties-card" id="penaltiesCard">
+            <div class="penalties-header">
+              <div class="penalties-title-wrap">
+                <span style="font-size: 22px;">⚖️</span>
+                <h3>Jarimalar bo'limi</h3>
+              </div>
+              <span class="penalties-badge" id="profilePenaltyBadge">0 so'm</span>
+            </div>
+
+            <!-- Xulosa kartochkalari -->
+            <div class="penalties-summary-box">
+              <div class="penalty-stat-item">
+                <div class="stat-title">Jami jarima</div>
+                <div class="stat-num danger" id="profileTotalPenalty">0 so'm</div>
+              </div>
+              <div class="penalty-stat-item">
+                <div class="stat-title">Kechikishlar</div>
+                <div class="stat-num" id="profileLateCount">0 marta</div>
+              </div>
+              <div class="penalty-stat-item">
+                <div class="stat-title">Jami vaqt</div>
+                <div class="stat-num" id="profileTotalLateMinutes">0 daq</div>
+              </div>
+            </div>
+
+            <!-- Davr filtrlari (Kun, Oy, Yil) -->
+            <div class="penalties-filters">
+              <select class="penalty-select" id="penaltyYearSelect" aria-label="Yil tanlash">
+                <option value="2026">2026-yil</option>
+                <option value="2025">2025-yil</option>
+                <option value="2024">2024-yil</option>
+                <option value="all">Barcha yillar</option>
+              </select>
+
+              <select class="penalty-select" id="penaltyMonthSelect" aria-label="Oy tanlash">
+                <option value="all">Barcha oylar</option>
+                <option value="01">Yanvar</option>
+                <option value="02">Fevral</option>
+                <option value="03">Mart</option>
+                <option value="04">Aprel</option>
+                <option value="05">May</option>
+                <option value="06">Iyun</option>
+                <option value="07">Iyul</option>
+                <option value="08">Avgust</option>
+                <option value="09">Sentyabr</option>
+                <option value="10">Oktabr</option>
+                <option value="11">Noyabr</option>
+                <option value="12">Dekabr</option>
+              </select>
+
+              <button class="penalty-refresh-btn" id="penaltyRefreshBtn" type="button" title="Yangilash">
+                🔄 Ko'rish
+              </button>
+            </div>
+
+            <!-- Jarimalar ro'yxati -->
+            <div class="penalty-list" id="penaltyHistoryList">
+              <div class="penalties-empty">Yuklanmoqda...</div>
+            </div>
+          </div>
+
+          <button class="logout-button" id="logoutButton" type="button">Chiqish</button>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Asosiy navigatsiya">
+        <button class="nav-item active" id="homeTab" type="button">
+          <span class="nav-icon">⌂</span>
+          <span>Asosiy</span>
+        </button>
+        <button class="nav-item" id="profileTab" type="button">
+          <span class="nav-icon">♙</span>
+          <span>Profil</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Loading ekrani (Ctrl+R boshlanganda sessiya tekshirilayotganda) -->
+    <div id="loadingScreen" style="display:none; position:fixed; inset:0; z-index:50; place-items:center; background:linear-gradient(145deg, #e8efff 0%, #dbe7fb 100%);">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; padding:24px;">
+        <div style="width:56px; height:56px; border:4px solid rgba(93,112,231,0.2); border-top-color:#5d70e7; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+        <div>
+          <div style="font-size:20px; font-weight:700; color:#3f51b5; margin-bottom:6px;">HRMS Davomat</div>
+          <div style="font-size:14px; color:#737985;">Ma'lumotlar yuklanmoqda, iltimos kuting...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-screen" id="loginScreen">
+      <div class="error-toast" id="errorToast" role="alert"></div>
+      <form class="login-card" id="loginForm">
+        <h1>Davomat</h1>
+        <p>HRMS hisobingiz orqali tizimga kiring</p>
+
+        <div class="field">
+          <label for="loginInput">Kirish</label>
+          <input id="loginInput" type="text" placeholder="Kirish kiritish" autocomplete="username" required />
+        </div>
+
+        <div class="field password-field">
+          <label for="passwordInput">Parol</label>
+          <input id="passwordInput" type="password" placeholder="Parol kiritish" autocomplete="current-password" required />
+          <button class="password-toggle" id="passwordToggle" type="button" aria-label="Parolni ko'rsatish" aria-pressed="false">◉</button>
+        </div>
+
+        <p class="login-error" id="loginError"></p>
+        <button class="login-button" type="submit">Kirish</button>
+      </form>
+    </div>
+
+    <div class="reason-modal" id="reasonModal" role="dialog" aria-modal="true" aria-labelledby="reasonTitle">
+      <div class="reason-card">
+        <h2 id="reasonTitle">Kiritish sabablari</h2>
+        <p id="reasonDescription"></p>
+        <textarea id="reasonInput" placeholder="Sabab yozing..." maxlength="500"></textarea>
+        <p class="reason-error" id="reasonError"></p>
+        <div class="reason-actions">
+          <button class="reason-cancel" id="reasonCancel" type="button">Bekor qilish</button>
+          <button class="reason-save" id="reasonSave" type="button">Saqlash</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scanner-modal" id="scannerModal" role="dialog" aria-modal="true" aria-label="Yuzni skanerlash">
+      <div class="scanner-card">
+        <div class="scanner-top-bar">
+          <button class="scanner-theme-btn" id="scannerThemeToggle" type="button" title="Fon yorug'ligini almashtirish">
+            <span id="scannerThemeIcon">💡</span>
+            <span id="scannerThemeText">Oq fon (Yoritish)</span>
+          </button>
+          <button class="scanner-close-btn" id="scannerCloseBtn" type="button" title="Yopish">✕</button>
+        </div>
+        <video class="scanner-video" id="scannerVideo" autoplay muted playsinline></video>
+        <p class="scanner-status" id="scannerStatus" aria-live="polite">Yuzingizni oval ichiga to'g'rilang.</p>
+      </div>
+    </div>
+
+    <!-- GPS va Geomanzil Maxsus Ogohlantirish Modali -->
+    <div class="geo-alert-modal" id="geoAlertModal" role="dialog" aria-modal="true">
+      <div class="geo-alert-card">
+        <div class="geo-alert-icon warning" id="geoAlertIcon">📍</div>
+        <h3 class="geo-alert-title" id="geoAlertTitle">Joylashuv Noto'g'ri</h3>
+        <p class="geo-alert-desc" id="geoAlertDesc">Siz belgilangan filial hududida emassiz.</p>
+        <div class="geo-alert-badge" id="geoAlertBadge">Filial radiusi: 100 m</div>
+        <button class="geo-alert-btn" id="geoAlertCloseBtn" type="button">Tushunarli</button>
+      </div>
+    </div>
+
+    <script>
+      const monthNames = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentyabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+      const weekdays = ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+
+      let selectedMonth = new Date().getMonth();
+      let selectedYear = new Date().getFullYear();
+      let employee = null;
+      let branchGeozone = null;
+
+      const history = document.getElementById('history');
+      const dashboardView = document.getElementById('dashboardView');
+      const profileView = document.getElementById('profileView');
+      const loginScreen = document.getElementById('loginScreen');
+      const app = document.querySelector('.app');
+      let cameraStream = null;
+      let scanning = false;
+
+      function formatDateText(date = new Date()) {
+        const day = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        const weekday = weekdays[date.getDay()];
+        return `${weekday}, ${day}.${String(month + 1).padStart(2, '0')}.${year}`;
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('errorToast');
+        toast.textContent = message;
+        toast.classList.add('visible');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => toast.classList.remove('visible'), 3000);
+      }
+
+      function formatDelayDuration(minutes) {
+        const d = Math.max(0, Number(minutes) || 0);
+        if (d <= 0) return "Kechikish yo'q";
+        if (d < 60) return `${d} daqiqa kech qoldingiz`;
+        const hours = Math.floor(d / 60);
+        const remaining = d % 60;
+        if (remaining === 0) return `${hours} soat kech qoldingiz`;
+        return `${hours} soat ${remaining} daqiqa kech qoldingiz`;
+      }
+
+      function renderHistory(records = []) {
+        document.getElementById('monthLabel').textContent = `${monthNames[selectedMonth]}, ${selectedYear}`;
+        if (!records.length) {
+          history.innerHTML = '<article class="day-card"><h3>Bu oy uchun yozuvlar mavjud emas</h3></article>';
+          return;
+        }
+
+        history.innerHTML = records.map(record => `
+          <article class="day-card">
+            <h3>${record.day}</h3>
+            <div class="day-details">
+              <span class="times">
+                <span class="arrive">|←</span> ${record.start}
+                <span class="leave">|→</span> ${record.end}
+              </span>
+              ${record.missed ? '<span class="missed">Kelmadi</span>' : ''}
+            </div>
+            ${record.delayMinutes > 0 ? `<p class="missed">${formatDelayDuration(record.delayMinutes)}</p>` : ''}
+          </article>
+        `).join('');
+      }
+
+      async function apiJSON(url, options = {}) {
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            Accept: 'application/json',
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            ...(options.headers || {})
+          }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.success === false) {
+          throw new Error(data.message || data.error || 'So\'rovni bajarib bo\'lmadi.');
+        }
+        return data;
+      }
+
+      function recordsFromLogs(logs = []) {
+        const byDate = new Map();
+        logs.forEach((log) => {
+          const isoDate = String(log.dateIso || log.timestamp || '');
+          const day = isoDate.slice(8, 10) || String(log.dateFormatted || '').slice(0, 2);
+          if (!/^[0-9]{2}$/.test(day)) return;
+          const record = byDate.get(day) || { 
+            day, 
+            start: '--:--', 
+            end: '--:--', 
+            missed: false, 
+            delayMinutes: 0, 
+            penaltyAmount: 0, 
+            penaltyFormatted: '0 so\'m',
+            isRestDay: false,
+            dateIso: isoDate.slice(0, 10) || log.dateIso
+          };
+          const time = /^[0-9]{2}:[0-9]{2}$/.test(String(log.timeFormatted || '')) ? log.timeFormatted : '--:--';
+          if (log.action === 'keldim') {
+            record.start = time;
+            record.delayMinutes = Math.max(0, Number(log.delayMinutes) || 0);
+            record.penaltyAmount = Number(log.penaltyAmount) || 0;
+            record.penaltyFormatted = log.penaltyFormatted || (record.penaltyAmount > 0 ? `${record.penaltyAmount.toLocaleString()} so'm` : '0 so\'m');
+            record.isRestDay = Boolean(log.isRestDay);
+          } else if (log.action === 'ketdim') {
+            record.end = time;
+          }
+          byDate.set(day, record);
+        });
+        return [...byDate.values()].sort((a, b) => Number(a.day) - Number(b.day));
+      }
+
+      function applyEmployee(data) {
+        employee = data.employee;
+        branchGeozone = data.branchGeozone || null;
+        document.querySelector('.profile h2').textContent = employee.fullName || '';
+        document.getElementById('nameInput').value = employee.fullName || '';
+        document.getElementById('branchInput').value = employee.branch || '';
+        document.getElementById('roleInput').value = employee.position || employee.lavozim || '';
+
+        const avatar = document.querySelector('.avatar');
+        if (employee.photoUrl) {
+          const image = document.createElement('img');
+          image.src = employee.photoUrl;
+          image.alt = employee.fullName || 'Xodim rasmi';
+          avatar.replaceChildren(image);
+          const profileImage = image.cloneNode();
+          document.getElementById('profilePhoto').replaceChildren(profileImage);
+        } else {
+          avatar.textContent = String(employee.fullName || '?').split(/\s+/).map(part => part[0]).slice(0, 2).join('').toUpperCase();
+          document.getElementById('profilePhoto').textContent = avatar.textContent;
+        }
+
+        const vacation = Boolean(employee.isVacationActive);
+        const trip = Boolean(employee.isTripActive);
+        const vacationButton = document.getElementById('remoteWorkButton');
+        const tripButton = document.getElementById('leaveButton');
+        vacationButton.hidden = !vacation;
+        tripButton.hidden = !trip;
+        vacationButton.classList.toggle('status-active', vacation);
+        tripButton.classList.toggle('status-active', trip);
+      }
+
+      function todayKey() {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      }
+
+      function updateDashboard(currentMonthRecords = []) {
+        document.getElementById('todayDate').textContent = formatDateText();
+        const now = new Date();
+        const todayNum = now.getDate();
+        const isCurrentMonth = (selectedYear === now.getFullYear() && selectedMonth === now.getMonth());
+
+        const todayRecord = isCurrentMonth
+          ? currentMonthRecords.find(r => Number(r.day) === todayNum)
+          : null;
+
+        document.getElementById('startTime').textContent = todayRecord?.start || '--:--';
+        document.getElementById('endTime').textContent = todayRecord?.end || '--:--';
+        document.getElementById('elapsedTime').textContent = todayRecord?.start
+          ? (todayRecord.end ? 'Ish kuni yakunlangan' : 'Ish davom etmoqda')
+          : 'Ish boshlanmagan';
+
+        // Bugungi jarima kartasi yangilanishi
+        const penaltyBox = document.getElementById('todayPenaltyBox');
+        const penaltyVal = document.getElementById('todayPenaltyVal');
+        const penaltySub = document.getElementById('todayPenaltySub');
+        const penaltyIcon = document.getElementById('todayPenaltyIcon');
+
+        if (!todayRecord || todayRecord.start === '--:--') {
+          penaltyBox.className = 'today-penalty-box on-time';
+          penaltyVal.className = 'penalty-val clean';
+          penaltyVal.textContent = '0 so\'m';
+          penaltySub.textContent = 'Bugun hali qayd qilinmadi';
+          penaltyIcon.textContent = '⏱️';
+        } else if (todayRecord.isRestDay) {
+          penaltyBox.className = 'today-penalty-box on-time';
+          penaltyVal.className = 'penalty-val clean';
+          penaltyVal.textContent = '0 so\'m';
+          penaltySub.textContent = 'Dam olish kuni (Jarima hisoblanmaydi)';
+          penaltyIcon.textContent = '🌴';
+        } else if (todayRecord.delayMinutes > 0 && todayRecord.penaltyAmount > 0) {
+          penaltyBox.className = 'today-penalty-box has-penalty';
+          penaltyVal.className = 'penalty-val';
+          penaltyVal.textContent = todayRecord.penaltyFormatted || `${todayRecord.penaltyAmount.toLocaleString()} so'm`;
+          penaltySub.textContent = `${formatDelayDuration(todayRecord.delayMinutes)} uchun jarima`;
+          penaltyIcon.textContent = '⚠️';
+        } else if (todayRecord.delayMinutes > 0) {
+          penaltyBox.className = 'today-penalty-box on-time';
+          penaltyVal.className = 'penalty-val clean';
+          penaltyVal.textContent = '0 so\'m';
+          penaltySub.textContent = `${formatDelayDuration(todayRecord.delayMinutes)} (Imtiyozli vaqt ichida)`;
+          penaltyIcon.textContent = '✅';
+        } else {
+          penaltyBox.className = 'today-penalty-box on-time';
+          penaltyVal.className = 'penalty-val clean';
+          penaltyVal.textContent = '0 so\'m';
+          penaltySub.textContent = 'Vaqtida kelingan (Kechikish yo\'q)';
+          penaltyIcon.textContent = '✅';
+        }
+      }
+
+      async function loadPenaltiesHistory() {
+        if (!employee) return;
+        const yearVal = document.getElementById('penaltyYearSelect')?.value || '2026';
+        const monthVal = document.getElementById('penaltyMonthSelect')?.value || 'all';
+
+        let url = `/api/hrms/history?`;
+        if (yearVal !== 'all') url += `year=${yearVal}&`;
+        if (monthVal !== 'all') {
+          const formattedMonth = yearVal !== 'all' ? `${yearVal}-${monthVal}` : monthVal;
+          url += `month=${formattedMonth}&`;
+        }
+
+        const listEl = document.getElementById('penaltyHistoryList');
+        if (listEl) listEl.innerHTML = '<div class="penalties-empty">Yuklanmoqda...</div>';
+
+        try {
+          const res = await apiJSON(url);
+          const logs = Array.isArray(res) ? res : (res.logs || []);
+          const summary = res.summary || {};
+
+          // Faqat "keldim" qaydlarini jarimalar uchun olamiz
+          const checkIns = logs.filter(l => l.action === 'keldim' && l.success);
+
+          // Jami jarima va kechikishlarni yangilash
+          const totalPenalty = summary.totalPenaltyAmount !== undefined 
+            ? summary.totalPenaltyAmount 
+            : checkIns.reduce((sum, l) => sum + (Number(l.penaltyAmount) || 0), 0);
+          
+          const lateRecords = checkIns.filter(l => (Number(l.delayMinutes) || 0) > 0);
+          const totalLateMin = checkIns.reduce((sum, l) => sum + (Number(l.delayMinutes) || 0), 0);
+
+          document.getElementById('profileTotalPenalty').textContent = totalPenalty > 0 ? `${totalPenalty.toLocaleString()} so'm` : "0 so'm";
+          document.getElementById('profilePenaltyBadge').textContent = totalPenalty > 0 ? `${totalPenalty.toLocaleString()} so'm` : "Jarima yo'q";
+          document.getElementById('profileLateCount').textContent = `${lateRecords.length} marta`;
+          
+          // Jami vaqtni formatlash (soat va daqiqa)
+          let totalLateFormatted = '0 daq';
+          if (totalLateMin >= 60) {
+            const h = Math.floor(totalLateMin / 60);
+            const m = totalLateMin % 60;
+            totalLateFormatted = m === 0 ? `${h} soat` : `${h} soat ${m} daq`;
+          } else if (totalLateMin > 0) {
+            totalLateFormatted = `${totalLateMin} daq`;
+          }
+          document.getElementById('profileTotalLateMinutes').textContent = totalLateFormatted;
+
+          if (!checkIns.length) {
+            listEl.innerHTML = '<div class="penalties-empty">Tanlangan davr bo\'yicha davomat qaydlari topilmadi.</div>';
+            return;
+          }
+
+          listEl.innerHTML = checkIns.map(item => {
+            const delay = Number(item.delayMinutes) || 0;
+            const penaltyAmt = Number(item.penaltyAmount) || 0;
+            const isLate = delay > 0;
+            const isRest = Boolean(item.isRestDay);
+            const dateStr = item.dateFormatted || item.dateIso || item.date || '';
+            const timeStr = item.timeFormatted || item.time || '--:--';
+
+            let statusNote = 'Vaqtida kelgan';
+            if (isRest) {
+              statusNote = 'Dam olish kuni';
+            } else if (isLate) {
+              statusNote = formatDelayDuration(delay);
+            }
+
+            return `
+              <div class="penalty-item ${isLate && penaltyAmt > 0 ? 'has-delay' : 'on-time'}">
+                <div>
+                  <div class="penalty-item-date">${dateStr}</div>
+                  <div class="penalty-item-meta">Kirish: <b>${timeStr}</b> • ${statusNote}</div>
+                </div>
+                <div class="penalty-item-amt">
+                  <div class="penalty-item-price ${penaltyAmt > 0 ? '' : 'zero'}">
+                    ${penaltyAmt > 0 ? `- ${penaltyAmt.toLocaleString()} so'm` : '0 so\'m'}
+                  </div>
+                  <div class="penalty-item-status">${penaltyAmt > 0 ? 'Jarima yozildi' : 'Jarimasiz'}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+        } catch (err) {
+          console.error("Jarimalar tarixini yuklashda xatolik:", err);
+          if (listEl) listEl.innerHTML = '<div class="penalties-empty" style="color:#ef4444;">Yuklashda xatolik yuz berdi.</div>';
+        }
+      }
+
+      async function loadAttendance() {
+        if (!employee) {
+          renderHistory([]);
+          updateDashboard([]);
+          return;
+        }
+        const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
+        try {
+          const data = await apiJSON(`/api/hrms/history?month=${monthKey}`);
+          const logs = Array.isArray(data) ? data : (data.logs || []);
+          const records = recordsFromLogs(logs);
+          renderHistory(records);
+          records.forEach((record, index) => {
+            const heading = document.querySelectorAll('#history .day-card h3')[index];
+            if (heading) {
+              heading.dataset.day = String(Number(record.day));
+              heading.parentElement.dataset.start = record.start === '--:--' ? '' : record.start;
+              heading.parentElement.dataset.end = record.end === '--:--' ? '' : record.end;
+            }
+          });
+          updateDashboard(records);
+          loadPenaltiesHistory();
+        } catch (error) {
+          renderHistory([]);
+          updateDashboard([]);
+          showToast(error.message || 'Davomat tarixini yuklab bo\'lmadi.');
+        }
+      }
+
+      async function restoreHrmsSession() {
+        try {
+          const data = await apiJSON('/api/hrms/session');
+          applyEmployee(data);
+          loginScreen.style.display = 'none';
+          loginScreen.classList.remove('visible');
+          app.style.display = '';
+          await loadAttendance();
+        } catch (error) {
+          employee = null;
+          app.style.display = 'none';
+          // Login xatosi faqat "Sessiya tugagan." bo'lmasa ko'rsatamiz
+          if (!error.message.includes('Sessiya tugagan.')) {
+            document.getElementById('loginError').textContent = error.message;
+          }
+          // login ekranni ko'rsatish — caller (finally) da amalga oshiriladi
+        }
+      }
+
+      async function stopScanner() {
+        scanning = false;
+        if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+        document.getElementById('scannerVideo').srcObject = null;
+        document.getElementById('scannerModal').classList.remove('visible');
+      }
+
+      // Ikki koordinata orasidagi masofani hisoblaydigan Haversine funksiyasi (metrda)
+      function getDistanceInMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Yer radiusi (metrda)
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return Math.round(R * c);
+      }
+
+      function showGeoAlert({ title, desc, badge, type = 'warning' }) {
+        const modal = document.getElementById('geoAlertModal');
+        const iconEl = document.getElementById('geoAlertIcon');
+        const titleEl = document.getElementById('geoAlertTitle');
+        const descEl = document.getElementById('geoAlertDesc');
+        const badgeEl = document.getElementById('geoAlertBadge');
+
+        titleEl.textContent = title;
+        descEl.innerHTML = desc;
+        badgeEl.textContent = badge || '';
+        badgeEl.style.display = badge ? 'inline-block' : 'none';
+
+        if (type === 'gps') {
+          iconEl.className = 'geo-alert-icon gps';
+          iconEl.textContent = '📡';
+        } else {
+          iconEl.className = 'geo-alert-icon warning';
+          iconEl.textContent = '📍';
+        }
+
+        modal.classList.add('visible');
+      }
+
+      document.getElementById('geoAlertCloseBtn')?.addEventListener('click', () => {
+        document.getElementById('geoAlertModal')?.classList.remove('visible');
+      });
+      document.getElementById('geoAlertModal')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+          document.getElementById('geoAlertModal')?.classList.remove('visible');
+        }
+      });
+
+      function getCurrentLocation() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('GPS_NOT_SUPPORTED'));
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            position => resolve({ 
+              latitude: position.coords.latitude, 
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy 
+            }),
+            error => {
+              if (error.code === 1) { // PERMISSION_DENIED
+                reject(new Error('GPS_PERMISSION_DENIED'));
+              } else if (error.code === 2) { // POSITION_UNAVAILABLE
+                reject(new Error('GPS_DISABLED'));
+              } else if (error.code === 3) { // TIMEOUT
+                reject(new Error('GPS_TIMEOUT'));
+              } else {
+                reject(new Error('GPS_ERROR'));
+              }
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
+          );
+        });
+      }
+
+      async function startAttendance(eventType) {
+        const actionBtn = eventType === 'keldim' ? document.getElementById('startButton') : document.getElementById('endButton');
+        const originalText = actionBtn ? actionBtn.textContent : '';
+        if (actionBtn) {
+          actionBtn.disabled = true;
+          actionBtn.textContent = 'Joylashuv tekshirilmoqda...';
+        }
+
+        // 1-QADAM: GPS orqali joylashuvni aniqlash
+        let location = null;
+        try {
+          location = await getCurrentLocation();
+        } catch (err) {
+          if (actionBtn) {
+            actionBtn.disabled = false;
+            actionBtn.textContent = originalText;
+          }
+
+          if (err.message === 'GPS_PERMISSION_DENIED') {
+            showGeoAlert({
+              type: 'gps',
+              title: "GPS ruxsati berilmagan!",
+              desc: "Davomatdan o'tish uchun brauzeringiz yoki telefon sozlamalaridan joylashuvga (GPS) ruxsat bering.",
+              badge: "Ruxsat talab etiladi"
+            });
+          } else if (err.message === 'GPS_DISABLED' || err.message === 'GPS_TIMEOUT') {
+            showGeoAlert({
+              type: 'gps',
+              title: "GPS ni yoqing!",
+              desc: "Telefoningiz yoki qurilmangizda GPS (geolokatsiya) o'chiq. Iltimos, davomat qilishdan oldin GPS ni yoqing va qayta urinib ko'ring.",
+              badge: "GPS o'chiq"
+            });
+          } else {
+            showGeoAlert({
+              type: 'gps',
+              title: "GPS aniqlanmadi!",
+              desc: "Qurilmangizda joylashuvni aniqlash imkoni bo'lmadi. GPS aloqasi yoqilganligini tekshirib, qayta bosing.",
+              badge: "GPS xatosi"
+            });
+          }
+          return;
+        }
+
+        // 2-QADAM: Har doim serverdan filialning eng oxirgi koordinatalarini olib yangilab olamiz (kesh qolib ketmasligi uchun)
+        try {
+          const freshSession = await apiJSON('/api/hrms/session');
+          if (freshSession && freshSession.branchGeozone) {
+            branchGeozone = freshSession.branchGeozone;
+          }
+        } catch (e) {
+          console.warn("Geozona yangilashda ogohlantirish:", e);
+        }
+
+        // Xodim filial maydoni / radiusi ichidami?
+        if (branchGeozone && branchGeozone.lat && branchGeozone.lon) {
+          const bLat = Number(branchGeozone.lat);
+          const bLon = Number(branchGeozone.lon);
+          const maxRadius = Number(branchGeozone.radius) || 100;
+          const distanceMeters = getDistanceInMeters(location.latitude, location.longitude, bLat, bLon);
+
+          if (distanceMeters > maxRadius) {
+            if (actionBtn) {
+              actionBtn.disabled = false;
+              actionBtn.textContent = originalText;
+            }
+            const distText = distanceMeters >= 1000 
+              ? `${(distanceMeters / 1000).toFixed(1)} km (${distanceMeters} metr)` 
+              : `${distanceMeters} metr`;
+            showGeoAlert({
+              type: 'warning',
+              title: "Siz belgilangan joyda emassiz!",
+              desc: `Siz o'z filialingiz (${branchGeozone.name || 'Filial'}) hududidan ${distText} uzoqlikdasiz. Davomat faqat filial maydonida qabul qilinadi!<br><br><small style="color: #64748b; font-size: 11px;">Sizning GPS: <b>${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}</b><br>Filial GPS: <b>${bLat.toFixed(6)}, ${bLon.toFixed(6)}</b></small>`,
+              badge: `Filial radiusi: ${maxRadius} metr | Masofa: ${distText}`
+            });
+            return;
+          }
+        }
+
+        if (actionBtn) {
+          actionBtn.disabled = false;
+          actionBtn.textContent = originalText;
+        }
+
+        // 3-QADAM: Faqat joylashuv to'g'ri bo'lgandagina yuz skaneri ochiladi!
+        const modal = document.getElementById('scannerModal');
+        const video = document.getElementById('scannerVideo');
+        const status = document.getElementById('scannerStatus');
+        modal.classList.add('visible');
+        status.textContent = 'Kameraga qarang';
+
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+          video.srcObject = cameraStream;
+          await video.play();
+          scanning = true;
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          while (scanning) {
+            if (video.videoWidth) {
+              canvas.width = 640;
+              canvas.height = Math.round(640 * video.videoHeight / video.videoWidth);
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              try {
+                const result = await apiJSON('/api/scan', {
+                  method: 'POST',
+                  body: JSON.stringify({ image: canvas.toDataURL('image/jpeg', 0.75), mirror: false })
+                });
+                status.textContent = result.message || 'Kameraga qarang';
+                if (result.recognized) {
+                  scanning = false;
+                  const data = await apiJSON('/api/hrms/check-in', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      action: eventType,
+                      userLat: location.latitude,
+                      userLon: location.longitude,
+                      faceToken: result.token
+                    })
+                  });
+                  status.textContent = data.message || (eventType === 'keldim' ? `Keldingiz: ${data.time}` : `Ketdingiz: ${data.time}`);
+                  await loadAttendance();
+                  setTimeout(stopScanner, 1100);
+                  return;
+                }
+              } catch (error) {
+                if (error instanceof TypeError) throw new Error('Server bilan aloqa uzildi.');
+                throw error;
+              }
+            }
+            await new Promise(resolve => setTimeout(resolve, 450));
+          }
+        } catch (error) {
+          status.textContent = error.name === 'NotAllowedError'
+            ? 'Kamera ruxsati berilmadi. Brauzer sozlamasidan kameraga ruxsat bering.'
+            : error.message || 'Davomatni boshlash imkoni bo\'lmadi.';
+          if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream = null;
+          video.srcObject = null;
+          scanning = false;
+        }
+      }
+
+      document.getElementById('startButton').addEventListener('click', () => startAttendance('keldim'));
+      document.getElementById('endButton').addEventListener('click', () => startAttendance('ketdim'));
+      
+      // Fon yorug'ligini almashtirish (Qorong'uda oq yorug'lik bilan yuzni yoritish)
+      const scannerModalEl = document.getElementById('scannerModal');
+      const scannerThemeToggleBtn = document.getElementById('scannerThemeToggle');
+      const scannerThemeIcon = document.getElementById('scannerThemeIcon');
+      const scannerThemeText = document.getElementById('scannerThemeText');
+      const scannerCloseBtn = document.getElementById('scannerCloseBtn');
+
+      let isScannerLightMode = localStorage.getItem('toyona_scanner_light_mode') === 'true';
+
+      function applyScannerTheme(isLight) {
+        if (isLight) {
+          scannerModalEl.classList.add('theme-light');
+          if (scannerThemeIcon) scannerThemeIcon.textContent = '🌙';
+          if (scannerThemeText) scannerThemeText.textContent = 'Standart qora';
+        } else {
+          scannerModalEl.classList.remove('theme-light');
+          if (scannerThemeIcon) scannerThemeIcon.textContent = '💡';
+          if (scannerThemeText) scannerThemeText.textContent = 'Oq fon (Yoritish)';
+        }
+      }
+
+      applyScannerTheme(isScannerLightMode);
+
+      if (scannerThemeToggleBtn) {
+        scannerThemeToggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          isScannerLightMode = !isScannerLightMode;
+          localStorage.setItem('toyona_scanner_light_mode', String(isScannerLightMode));
+          applyScannerTheme(isScannerLightMode);
+        });
+      }
+
+      if (scannerCloseBtn) {
+        scannerCloseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          stopScanner();
+        });
+      }
+
+      document.getElementById('scannerModal').addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+          stopScanner();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.getElementById('scannerModal').classList.contains('visible')) {
+          stopScanner();
+        }
+      });
+
+      function toggleTab(tab) {
+        if (tab === 'home') {
+          dashboardView.classList.remove('hidden');
+          profileView.classList.remove('visible');
+          document.getElementById('homeTab').classList.add('active');
+          document.getElementById('profileTab').classList.remove('active');
+        } else {
+          dashboardView.classList.add('hidden');
+          profileView.classList.add('visible');
+          document.getElementById('profileTab').classList.add('active');
+          document.getElementById('homeTab').classList.remove('active');
+        }
+      }
+
+      function toggleInfoCard(cardId, otherCardId) {
+        const card = document.getElementById(cardId);
+        const other = document.getElementById(otherCardId);
+        const isVisible = card.classList.contains('visible');
+        other.classList.remove('visible');
+        card.classList.toggle('visible', !isVisible);
+      }
+
+      function askReason(title, description) {
+        return new Promise((resolve) => {
+          const modal = document.getElementById('reasonModal');
+          const titleEl = document.getElementById('reasonTitle');
+          const descEl = document.getElementById('reasonDescription');
+          const input = document.getElementById('reasonInput');
+          const errorEl = document.getElementById('reasonError');
+
+          titleEl.textContent = title;
+          descEl.textContent = description;
+          input.value = '';
+          errorEl.textContent = '';
+          modal.classList.add('visible');
+          input.focus();
+
+          const finish = (value) => {
+            modal.classList.remove('visible');
+            document.getElementById('reasonSave').onclick = null;
+            document.getElementById('reasonCancel').onclick = null;
+            resolve(value);
+          };
+
+          document.getElementById('reasonSave').onclick = () => {
+            const reason = input.value.trim();
+            if (!reason) {
+              errorEl.textContent = 'Sababni kiriting.';
+              input.focus();
+              return;
+            }
+            finish(reason);
+          };
+
+          document.getElementById('reasonCancel').onclick = () => finish(null);
+        });
+      }
+
+      document.getElementById('previousMonth').addEventListener('click', () => {
+        selectedMonth -= 1;
+        if (selectedMonth < 0) {
+          selectedMonth = 11;
+          selectedYear -= 1;
+        }
+        loadAttendance();
+      });
+
+      document.getElementById('nextMonth').addEventListener('click', () => {
+        selectedMonth += 1;
+        if (selectedMonth > 11) {
+          selectedMonth = 0;
+          selectedYear += 1;
+        }
+        loadAttendance();
+      });
+
+      document.getElementById('homeTab').addEventListener('click', () => toggleTab('home'));
+      document.getElementById('profileTab').addEventListener('click', () => {
+        toggleTab('profile');
+        loadPenaltiesHistory();
+      });
+
+      document.getElementById('penaltyYearSelect')?.addEventListener('change', () => loadPenaltiesHistory());
+      document.getElementById('penaltyMonthSelect')?.addEventListener('change', () => loadPenaltiesHistory());
+      document.getElementById('penaltyRefreshBtn')?.addEventListener('click', () => loadPenaltiesHistory());
+
+      document.getElementById('remoteWorkButton').addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleInfoCard('remoteWorkInfo', 'leaveInfo');
+      });
+
+      document.getElementById('leaveButton').addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleInfoCard('leaveInfo', 'remoteWorkInfo');
+      });
+
+      document.addEventListener('click', () => {
+        document.getElementById('remoteWorkInfo').classList.remove('visible');
+        document.getElementById('leaveInfo').classList.remove('visible');
+      });
+
+      document.getElementById('logoutButton').addEventListener('click', async () => {
+        await stopScanner();
+        try {
+          await apiJSON('/api/hrms/logout', { method: 'POST', body: '{}' });
+        } catch {}
+        employee = null;
+        branchGeozone = null;
+        app.style.display = 'none';
+        loginScreen.style.display = '';
+        loginScreen.classList.add('visible');
+      });
+
+      document.getElementById('passwordToggle').addEventListener('click', () => {
+        const input = document.getElementById('passwordInput');
+        const visible = input.type === 'text';
+        input.type = visible ? 'password' : 'text';
+        const btn = document.getElementById('passwordToggle');
+        btn.textContent = visible ? '◉' : '◌';
+        btn.setAttribute('aria-pressed', String(!visible));
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const loginBtn = document.querySelector('.login-button');
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const error = document.getElementById('loginError');
+
+        const username = loginInput.value.trim();
+        const password = passwordInput.value;
+        error.textContent = '';
+
+        // Yuklanish holati: tugma va maydonlarni bloklash, spinner qo'shish
+        loginBtn.disabled = true;
+        loginInput.disabled = true;
+        passwordInput.disabled = true;
+        const originalBtnText = loginBtn.innerHTML;
+        loginBtn.innerHTML = '<span class="btn-spinner"></span> Tekshirilmoqda...';
+
+        try {
+          const data = await apiJSON('/api/hrms/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+          });
+          applyEmployee(data);
+          passwordInput.value = '';
+          loginScreen.classList.remove('visible');
+          app.style.display = '';
+          await loadAttendance();
+        } catch (loginError) {
+          error.textContent = loginError.message;
+        } finally {
+          // Xatolik bo'lsa yoki tugasa yana maydonlarni ochish
+          loginBtn.disabled = false;
+          loginInput.disabled = false;
+          passwordInput.disabled = false;
+          loginBtn.innerHTML = originalBtnText;
+        }
+      });
+
+      // Sahifa yuklanganda darhol login ko'rsatmaslik — avval sessiyani tekshiramiz
+      app.style.display = 'none';
+      loginScreen.style.display = 'none'; // login ekranni yashirib turish
+
+      // Kutish (loading) ekrani ko'rsatish
+      const loadingScreen = document.getElementById('loadingScreen');
+      if (loadingScreen) loadingScreen.style.display = 'grid';
+
+      updateDashboard();
+
+      restoreHrmsSession().finally(() => {
+        // Loading ekranini o'chirish
+        if (loadingScreen) loadingScreen.style.display = 'none';
+        // Agar sessiya tiklanmagan bo'lsa login ekranini ko'rsatish
+        if (!employee) {
+          loginScreen.style.display = '';
+          loginScreen.classList.add('visible');
+        }
+      });
+    </script>
+  </body>
+</html>
