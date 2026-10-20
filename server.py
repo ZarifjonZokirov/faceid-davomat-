@@ -22,7 +22,7 @@ import numpy as np
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "attendance.csv")
 SESSION_FILE = os.path.join(BASE_DIR, "sessions.json")
-HRMS_BASE_URL = os.environ.get("HRMS_BASE_URL", "http://127.0.0.1:3000").rstrip("/")
+HRMS_BASE_URL = os.environ.get("HRMS_BASE_URL", "https://hrms-toyona.vercel.app").rstrip("/")
 SESSION_COOKIE = "toyona_attendance_session"
 SESSION_TTL = 24 * 60 * 60
 FACE_TOKEN_TTL = 60
